@@ -1,0 +1,37 @@
+# Ignore editor and IDE files
+.vscode/
+.idea/
+.DS_Store
+.AppleDouble
+.LSOverride
+Icon
+._*
+
+# Ignore build artifacts
+dist/
+build/
+
+# Ignore temporary files
+*.tmp
+*.bak
+
+# Ignore version control files
+.git/
+.gitignore
+
+# Ignore documentation files
+docs/
+
+# Ignore test files
+test/
+tests/
+
+# Ignore configuration files
+config/
+configs/
+
+# Ignore logs
+logs/
+
+# Ignore cache files
+.cache/
