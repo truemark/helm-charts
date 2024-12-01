@@ -1,0 +1,20 @@
+{{- if (.Values.configMap).enabled }}
+{{- range $nameSuffix, $data := .Values.configMap.files }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ template "k8s-app.name" $ }}-{{ $nameSuffix }}
+  labels:
+  {{- include "k8s-app.labels" $ | nindent 4 }}
+{{- if $.Values.configMap.additionalLabels }}
+{{- toYaml $.Values.configMap.additionalLabels | nindent 4 }}
+{{- end }}
+{{- if $.Values.configMap.annotations }}
+  annotations:
+{{- toYaml $.Values.configMap.annotations | nindent 4 }}
+{{- end }}
+data:
+{{- include "k8s-app.tplvalues.render" ( dict "value" $data "context" $ ) | nindent 2 }}
+{{- end }}
+{{- end }}

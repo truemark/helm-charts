@@ -1,0 +1,22 @@
+{{- if and (.Values.grafanaDashboard).enabled  -}}
+{{- range $name, $content := .Values.grafanaDashboard.contents }}
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ $name }}
+  labels:
+    grafana_dashboard: "1"
+    {{- include "k8s-app.labels" $ | nindent 4 }}
+  {{- if $.Values.grafanaDashboard.additionalLabels }}
+    {{- toYaml $.Values.grafanaDashboard.additionalLabels | nindent 4 }}
+  {{- end }}
+  {{- if $.Values.grafanaDashboard.annotations }}
+  annotations:
+    {{- toYaml $.Values.grafanaDashboard.annotations | nindent 4 }}
+  {{- end }}
+data:
+  {{ $name }}: |-
+    {{- $content | nindent 4 }}
+{{- end }}
+{{- end }}

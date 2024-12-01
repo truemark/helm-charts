@@ -1,0 +1,10 @@
+apiVersion: v2
+name: k8s-app
+description: |
+  This Helm chart is designed to deploy applications on Kubernetes.
+type: application
+version: 0.0.1
+maintainers:
+  - name: TrueMark DevOps
+    email: devops@truemark.io
+icon: https://www.truemark.io/brand/logo_icon_for_profiles.png

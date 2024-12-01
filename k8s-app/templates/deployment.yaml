@@ -1,0 +1,36 @@
+{{- if .Values.deployment.enabled }}
+---
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: {{ include "k8s-app.name" . }}
+  labels:
+    {{- include "k8s-app.labels" . | nindent 4 }}
+    {{- if .Values.deployment.additionalLabels }}
+      {{- toYaml .Values.deployment.additionalLabels | nindent 4 }}
+    {{- end }}
+  {{- if or .Values.deployment.annotations .Values.deployment.reloadOnChange }}
+  annotations:
+    {{- if .Values.deployment.annotations }}
+    {{- toYaml .Values.deployment.annotations | nindent 4 }}
+    {{- end }}
+    {{- if .Values.deployment.reloadOnChange }} 
+    reloader.stakater.com/auto: "true"
+    {{- end }}
+  {{- end }}
+spec:
+{{- if .Values.deployment.replicas }}
+  replicas: {{ .Values.deployment.replicas }}
+{{- end }}
+  selector:
+    matchLabels:
+      {{- include "k8s-app.selectorLabels" . | nindent 6 }}
+  {{- if .Values.deployment.strategy }}
+  strategy:
+    {{- toYaml .Values.deployment.strategy | nindent 4 }}
+  {{- end }}
+  {{- if not (kindIs "invalid" .Values.deployment.revisionHistoryLimit) }}
+  revisionHistoryLimit: {{ .Values.deployment.revisionHistoryLimit }}
+  {{- end }}
+  template: {{ template "k8s-app.podTemplate" . }}
+{{- end }}

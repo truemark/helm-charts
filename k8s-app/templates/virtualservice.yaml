@@ -1,0 +1,20 @@
+{{- if and (.Values.istio.virtualServices).enabled (.Capabilities.APIVersions.Has "networking.istio.io/v1alpha3") }}
+{{- range $nameSuffix, $spec := .Values.istio.virtualServices.spec }}
+---
+apiVersion: networking.istio.io/v1alpha3
+kind: VirtualService
+metadata:
+  name: {{ template "k8s-app.name" $ }}-{{ $nameSuffix }}
+  labels:
+    {{- include "k8s-app.labels" $ | nindent 4 }}
+  {{- if $.Values.istio.virtualServices.additionalLabels }}
+    {{ toYaml $.Values.istio.virtualServices.additionalLabels | indent 4 }}
+  {{- end }}
+  {{- if $.Values.istio.virtualServices.annotations }}
+  annotations:
+  {{ toYaml $.Values.istio.virtualServices.annotations | indent 4 }}
+  {{- end }}
+spec:
+  {{- toYaml $spec | nindent 2 }}
+{{- end }}
+{{- end }}

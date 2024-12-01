@@ -1,0 +1,54 @@
+{{- if (.Values.service).enabled }}
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ template "k8s-app.name" . }}
+  labels:
+  {{- include "k8s-app.labels" . | nindent 4 }}
+  {{- if .Values.service.additionalLabels }}
+    {{- toYaml .Values.service.additionalLabels | nindent 4 }}
+  {{- end }}
+  {{- if .Values.service.annotations }}
+  annotations:
+    {{- include "k8s-app.tplvalues.render" ( dict "value" .Values.service.annotations  "context" $ ) | nindent 4 }}
+  {{- end }}
+spec:
+  type: {{ .Values.service.type }}
+  {{- with .Values.service.clusterIP }}
+  clusterIP: {{ . }}
+  {{- end }}
+  {{- if eq .Values.service.type "LoadBalancer" }}
+  {{- with .Values.service.loadBalancerIP }}
+  loadBalancerIP: {{ . }}
+  {{- end }}
+  {{- with .Values.service.loadBalancerSourceRanges }}
+  loadBalancerSourceRanges:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  {{- end }}
+  {{- with .Values.service.externalIPs }}
+  externalIPs:
+    {{- toYaml . | nindent 4 }}
+  {{- end }}
+  selector:
+    {{- include "k8s-app.selectorLabels" . | nindent 4 }}
+  {{- if .Values.deployment.podLabels }}
+    {{- toYaml .Values.deployment.podLabels | nindent 4 }}
+  {{- end }}
+  ports:
+  {{- range $name, $config := .Values.deployment.ports }}
+  {{- if $config.exposed}}
+    - name: {{ $name }}
+      protocol: {{ default "TCP" $config.protocol | quote }}
+      port: {{ $config.port }}
+      targetPort: {{ default $config.port $config.containerPort }}
+      {{- if $config.nodePort }}
+      nodePort: {{ $config.nodePort }}
+      {{- end }}
+  {{- end }}
+  {{- end }}
+  {{- if .Values.service.ports }}
+    {{- toYaml .Values.service.ports | nindent 4 }}
+  {{- end }}
+{{- end }}
